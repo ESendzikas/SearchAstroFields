@@ -1,13 +1,12 @@
 import copy
-
 import numpy as np
-# import pandas as pd
-
 
 m = np.loadtxt("trgb3877_only_RaDec_gri_BVRI.dat")  # загружаем таблицу с координатами
 field = 1.5  # размер поля в градусах
-cols = [1, 2]  # выбираем столбцы с координатами
+cols = [1, 2]  # выбираем столбцы с координатами из исходной таблицы, отсчёт столбцов необходимо начинать с нуля (у меня в нулевом столбце название объектов)
 coordinates = m[:, cols]  # записываем координаты в отдельную таблицу
+
+##  вспомогательные переменные
 a2 = []  # номера строк образующих близкую пару
 b2 = []
 m2 = []
@@ -60,6 +59,8 @@ g9 = []
 h9 = []
 i9 = []
 m9 = []
+
+
 for i in np.arange(len(coordinates)):
     for j in np.arange(len(coordinates)):
         if i != j:  # условие, чтобы не сравнивать строку с собой же
@@ -208,6 +209,7 @@ for j in np.arange(len(coordinates)):
                                                                             h9.append(h8[i])
                                                                             i9.append(j)
                                                                             m9.append([a8[i], b8[i], c8[i], d8[i], e8[i], f8[i], g8[i], h8[i], j])
+
 FC = []
 filmed = []
 lastfilmed = []
@@ -238,7 +240,6 @@ def filmedrange(x):
     for j in np.arange(len(lastfilmed)):
         (A[x])[i].remove(lastfilmed[j])
 
-
 def removeoverlap(x, ll):
     for l in np.arange(ll, len(A[x])):
         if not A[x][l]:
@@ -252,14 +253,12 @@ def removeoverlap(x, ll):
     ll = remove1(ll, x)
     return ll
 
-
 def remove1(ll, x):
     for n in np.arange(len(lastfilmed)):
         if (lastfilmed[n]) in A[x][ll]:
             A[x][ll].remove(lastfilmed[n])
     ll += 1
     return ll
-
 
 def removelilmed(x):
     ll = 0
@@ -288,27 +287,21 @@ def sort(x):
     return -1
 
 def main(x):
-    for i in np.arange(1000):
-    # while 1 == 1:
+    # for i in np.arange(1000):  # цикл найдёт указанное в скобках количество площадок
+    while 1 == 1:  # цикл считает пока не дойдёт до конца
         zz = sort(x)
         if zz == -1:
             break
         removefilmed(zz)
         x = zz
 
-
 zz = 0
-main(9)
+main(9)  # программа будет искать до 9 близких объектов
 combined_x_y_arrays = np.column_stack([FCx, FCy])
 nofilmedc = np.delete(coordinates, [filmed], 0)
 allFC = np.append(combined_x_y_arrays, nofilmedc, axis=0)
-# indexx = copy.copy(m[:, 0])
-# nofilmedi = np.delete(indexx, [filmed], 0)
-# ind.tolist()
 nofilmedi = []
 nofilmedi = np.arange(len(coordinates))
-print(nofilmedi)
-print(filmed)
 nofilmedi = np.delete(nofilmedi, filmed, 0)
 nofilmedi = nofilmedi + 1
 zzz = np.zeros((len(allFC), len(FC[0])))
@@ -316,22 +309,8 @@ allFC2 = np.append(allFC, zzz, axis=1)
 for i in np.arange(len(FC)):
     for j in np.arange(len(FC[i])):
         allFC2[i][2+j] = FC[i][j]
-# nofilmedi = np.where(filmed not in nofilmedi, nofilmedi, None)
 for i in np.arange(len(combined_x_y_arrays), len(allFC)):
     allFC2[i][2] = nofilmedi[i-len(combined_x_y_arrays)]
-# allFC2 = np.where(allFC2 != 0, allFC2, '-')
-# allFC2 = allFC2.ravel()[np.flatnonzero(allFC2)]
 
-np.savetxt('test.csv', allFC2, fmt=['%3.4f', '%3.4f', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i'])
-# allFC2.to_csv('test.csv')
 
-print(FCx)
-print(FCy)
-print(len(FCy))
-print(filmed)
-print(FC)
-print(m8)
-print(m7)
-# print(nofilmedi)
-print(allFC2)
-
+np.savetxt('test.dat', allFC2, fmt=['%3.4f', '%3.4f', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i'])  #
